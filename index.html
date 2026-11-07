@@ -8,6 +8,7 @@
         body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
         button { padding: 15px 30px; font-size: 18px; margin: 10px; }
         #checklist { margin-top: 20px; text-align: left; display: inline-block; }
+        .task-item { margin: 10px 0; font-size: 18px; }
     </style>
 </head>
 <body>
@@ -26,11 +27,10 @@
                     if (data.error) {
                         container.innerHTML = '<p>' + data.error + '</p>';
                     } else {
-                        let html = '<h2>Λίστα για τον κωδικό: ' + data.qr_id + '</h2><ol>';
+                        let html = '<h2>Λίστα για τον κωδικό: ' + data.qr_id + '</h2>';
                         data.checklist.forEach(item => {
-                            html += '<li>' + item.checkpoint + '</li>';
+                            html += '<div class="task-item"><input type="checkbox" id="step' + item.step + '"> <label for="step' + item.step + '">' + item.checkpoint + '</label></div>';
                         });
-                        html += '</ol>';
                         container.innerHTML = html;
                     }
                 })
