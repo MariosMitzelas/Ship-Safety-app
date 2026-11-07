@@ -31,6 +31,34 @@ SUBMISSIONS_FILE = os.path.join(
 )
 
 
+def cleanup_old_submissions():
+  if not os.path.exists(SUBMISSIONS_FILE):
+    return
+
+  try:
+    with open(SUBMISSIONS_FILE, "r", encoding="utf-8") as f:
+      data = json.load(f)
+      if not isinstance(data, list):
+        return
+  except (json.JSONDecodeError, Exception):
+    return
+
+  cutoff_date = datetime.datetime.utcnow() - datetime.timedelta(days=30)
+  fresh_data = []
+
+  for entry in data:
+    try:
+      entry_date = datetime.datetime.strptime(entry["date"], "%Y-%m-%d")
+      if entry_date >= cutoff_date:
+        fresh_data.append(entry)
+    except (ValueError, KeyError):
+      continue
+
+  if len(fresh_data) != len(data):
+    with open(SUBMISSIONS_FILE, "w", encoding="utf-8") as f:
+      json.dump(fresh_data, f, indent=4, ensure_ascii=False)
+
+
 @app.route("/")
 def home():
   return render_template("index.html")
@@ -99,6 +127,8 @@ def submit_checklist():
     with open(SUBMISSIONS_FILE, "w", encoding="utf-8") as f:
       json.dump(data, f, indent=4, ensure_ascii=False)
 
+    cleanup_old_submissions()
+
     return (
         jsonify({
             "success": True,
@@ -110,6 +140,26 @@ def submit_checklist():
 
   except Exception as e:
     return jsonify({"success": False, "error": f"File storage failure: {e}"}), 500
+
+
+@app.route("/view_submissions", methods=["GET"])
+def view_submissions():
+  data = []
+  if os.path.exists(SUBMISSIONS_FILE):
+    try:
+      with open(SUBMISSIONS_FILE, "r", encoding="utf-8") as f:
+        data = json.load(f)
+        if not isinstance(data, list):
+          data = []
+    except (json.JSONDecodeError, Exception):
+      data = []
+
+  # Ταξινόμηση ώστε οι πιο πρόσφατες υποβολές να φαίνονται πρώτες
+  data.sort(
+      key=lambda x: x.get("time_utc", ""),
+      reverse=True,
+  )
+  return render_template("submissions.html", submissions=data)
 
 
 if __name__ == "__main__":
