@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Λίστα Ελέγχου Ασφαλείας</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+        button { padding: 15px 30px; font-size: 18px; margin: 10px; }
+        #checklist { margin-top: 20px; text-align: left; display: inline-block; }
+    </style>
+</head>
+<body>
+
+    <h1>Έλεγχος Ασφαλείας</h1>
+    <button onclick="loadChecklist('QR123')">Φόρτωση Λίστας QR123</button>
+
+    <div id="checklist"></div>
+
+    <script>
+        function loadChecklist(qrId) {
+            fetch('/get_checklist?qr_id=' + qrId)
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('checklist');
+                    if (data.error) {
+                        container.innerHTML = '<p>' + data.error + '</p>';
+                    } else {
+                        let html = '<h2>Λίστα για τον κωδικό: ' + data.qr_id + '</h2><ol>';
+                        data.checklist.forEach(item => {
+                            html += '<li>' + item.checkpoint + '</li>';
+                        });
+                        html += '</ol>';
+                        container.innerHTML = html;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+</html>
