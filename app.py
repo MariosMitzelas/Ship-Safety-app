@@ -5,12 +5,36 @@ import os
 app = Flask(__name__)
 
 DATA_FILE = 'safety_checks.csv'
+CHECKLISTS_FILE = 'checklists_template.csv'
 
 def init_csv():
     if not os.path.exists(DATA_FILE):
         with open(DATA_FILE, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
             writer.writerow(['Timestamp', 'Sailor_Name', 'Round_ID', 'Status'])
+
+def load_checklists():
+    checklists = {}
+    if os.path.exists(CHECKLISTS_FILE):
+        with open(CHECKLISTS_FILE, mode='r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                qr_id = row['QR_ID']
+                if qr_id not in checklists:
+                    checklists[qr_id] = []
+                checklists[qr_id].append({
+                    'step_number': row['Step_Number'],
+                    'checkpoint': row['Checkpoint']
+                })
+    return checklists
+
+@app.route('/get_checklist', methods=['GET'])
+def get_checklist():
+    qr_id = request.args.get('qr_id')
+    checklists = load_checklists()
+    if qr_id in checklists:
+        return jsonify({'qr_id': qr_id, 'checklist': checklists[qr_id]}), 200
+    return jsonify({'error': 'Checklist not found'}), 404
 
 @app.route('/submit', methods=['POST'])
 def submit_check():
@@ -29,4 +53,4 @@ def submit_check():
 if __name__ == '__main__':
     init_csv()
     app.run(host='0.0.0.0', port=5000)
-``` Αυτός ο βασικός κώδικας δημιουργεί έναν διακομιστή που δέχεται δεδομένα και τα αποθηκεύει σε αρχείο.
+``` Αυτός ο κώδικας διαβάζει το αρχείο με τις λίστες και επιστρέφει τα βήματα ανάλογα με τον κωδικό QR που θα σκαναριστεί.
