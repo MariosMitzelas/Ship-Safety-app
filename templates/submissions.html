@@ -3,48 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Officer Inspection Dashboard</title>
+    <title>Inspection Log Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f6f9; }
-        h1 { text-align: center; color: #333; }
-        .submission-card { background: white; margin-bottom: 20px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 5px solid #007bff; }
-        .card-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; font-weight: bold; flex-wrap: wrap; gap: 10px; }
-        .task-list { list-style: none; padding: 0; }
-        .task-item { padding: 5px 0; display: flex; align-items: center; }
-        .status-icon { margin-right: 10px; font-weight: bold; }
-        .status-done { color: green; }
-        .status-pending { color: red; }
-        .empty-msg { text-align: center; font-size: 18px; color: #666; margin-top: 50px; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            color: #102a43;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 1.5rem;
+            color: #102a43;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 5px solid #0056b3;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+        .meta-info {
+            font-size: 0.9rem;
+            color: #627d98;
+            margin-bottom: 10px;
+        }
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 0.9rem;
+            border-bottom: 1px dashed #f0f4f8;
+        }
+        .badge {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #e2e8f0;
+        }
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
     </style>
 </head>
 <body>
+<div class="container">
+    <h1>Inspection Logs</h1>
 
-    <h1>Equipment Inspection Submissions</h1>
-
-    {% if submissions %}
-        {% for sub in submissions %}
-            <div class="submission-card">
-                <div class="card-header">
-                    <span>Code: {{ sub['qr_id'] }}</span>
-                    <span>Sailor: {{ sub['sailor_name'] }}</span>
-                    <span>Shift: {{ sub['shift'] }}</span>
-                    <span>Date: {{ sub['date'] }} {{ sub['time_utc'] }} UTC</span>
-                </div>
-                <ul class="task-list">
-                    {% for item in sub['items'] %}
-                        <li class="task-item">
-                            <span class="status-icon {{ 'status-done' if item['completed'] else 'status-pending' }}">
-                                {{ '✔' if item['completed'] else '✖' }}
-                            </span>
-                            {{ item['step'] }}. {{ item['checkpoint'] }}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endfor %}
-    {% else %}
-        <div class="empty-msg">No submissions recorded in the last 30 days.</div>
+    {% if not submissions %}
+        <p>Δεν υπάρχουν ακόμη καταγεγραμμένες επιθεωρήσεις.</p>
     {% endif %}
 
+    {% for sub in submissions %}
+    <div class="card">
+        <div class="card-header">
+            <span>Inspector: {{ sub.sailor_name }}</span>
+            <span class="badge badge-success">{{ sub.qr_id }}</span>
+        </div>
+        <div class="meta-info">
+            <strong>Watch:</strong> {{ sub.shift }} | <strong>Date/Time:</strong> {{ sub.timestamp }}
+        </div>
+        <ul class="task-list">
+            {% for item in sub['items'] %}
+            <li class="task-item">
+                <span>{{ item.checkpoint if item.checkpoint else item }}</span>
+                <span class="badge badge-success">Verified</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+</div>
 </body>
 </html>
