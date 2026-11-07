@@ -3,22 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Λίστα Ελέγχου Ασφαλείας</title>
+    <title>Scanner Λίστας Ελέγχου</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
-        button { padding: 15px 30px; font-size: 18px; margin: 10px; }
+        #reader { width: 300px; margin: auto; }
         #checklist { margin-top: 20px; text-align: left; display: inline-block; }
         .task-item { margin: 10px 0; font-size: 18px; }
     </style>
 </head>
 <body>
 
-    <h1>Έλεγχος Ασφαλείας</h1>
-    <button onclick="loadChecklist('QR123')">Φόρτωση Λίστας QR123</button>
+    <h1>Σκανάρετε τον Κωδικό QR</h1>
+    <div id="reader"></div>
 
     <div id="checklist"></div>
 
     <script>
+        function onScanSuccess(decodedText, decodedResult) {
+            html5QrcodeScanner.clear();
+            loadChecklist(decodedText);
+        }
+
+        let html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", { fps: 10, qrbox: 250 });
+        html5QrcodeScanner.render(onScanSuccess);
+
         function loadChecklist(qrId) {
             fetch('/get_checklist?qr_id=' + qrId)
                 .then(response => response.json())
