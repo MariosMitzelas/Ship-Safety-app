@@ -2,6 +2,9 @@ import csv
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
+@app.route("/")
+def home():
+  return "Checklist API is running!"
 
 
 def load_checklists():
