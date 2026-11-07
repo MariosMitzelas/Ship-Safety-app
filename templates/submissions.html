@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Πίνακας Ελέγχων Αξιωματικού</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f6f9; }
+        h1 { text-align: center; color: #333; }
+        .submission-card { background: white; margin-bottom: 20px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 5px solid #007bff; }
+        .card-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; font-weight: bold; }
+        .task-list { list-style: none; padding: 0; }
+        .task-item { padding: 5px 0; display: flex; align-items: center; }
+        .status-icon { margin-right: 10px; font-weight: bold; }
+        .status-done { color: green; }
+        .status-pending { color: red; }
+        .empty-msg { text-align: center; font-size: 18px; color: #666; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+    <h1>Υποβολές Ελέγχων Εξοπλισμού</h1>
+
+    {% if submissions %}
+        {% for sub in submissions %}
+            <div class="submission-card">
+                <div class="card-header">
+                    <span>Κωδικός: {{ sub.qr_id }}</span>
+                    <span>Βάρδια: {{ sub.shift }}</span>
+                    <span>Ημερομηνία: {{ sub.date }} {{ sub.time_utc }} UTC</span>
+                </div>
+                <ul class="task-list">
+                    {% for item in sub.items %}
+                        <li class="task-item">
+                            <span class="status-icon {{ 'status-done' if item.completed else 'status-pending' }}">
+                                {{ '✔' if item.completed else '✖' }}
+                            </span>
+                            {{ item.step }}. {{ item.checkpoint }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-msg">Δεν υπάρχουν καταχωρημένες υποβολές τις τελευταίες 30 ημέρες.</div>
+    {% endif %}
+
+</body>
+</html>
