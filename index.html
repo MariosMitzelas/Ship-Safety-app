@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="el">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Σύστημα Ελέγχου Εξοπλισμού</title>
+    <title>Equipment Checklist System</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         body { 
@@ -90,7 +90,7 @@
 </head>
 <body>
 
-    <h2>Σύστημα Ελέγχου Εξοπλισμού</h2>
+    <h2>Equipment Checklist System</h2>
     <div id="reader"></div>
 
     <div id="status-msg"></div>
@@ -99,12 +99,12 @@
         <h3 id="form-title"></h3>
 
         <div class="form-group">
-            <label for="sailor-name">Όνομα Ναυτίου:</label>
-            <input type="text" id="sailor-name" placeholder="Εισάγετε ονοματεπώνυμο">
+            <label for="sailor-name">Sailor Name:</label>
+            <input type="text" id="sailor-name" placeholder="Enter full name">
         </div>
 
         <div class="form-group">
-            <label for="shift-select">Βάρδια (Watch / Shift):</label>
+            <label for="shift-select">Watch / Shift:</label>
             <select id="shift-select">
                 <option value="00:00 - 04:00">00:00 - 04:00</option>
                 <option value="04:00 - 08:00">04:00 - 08:00</option>
@@ -117,7 +117,7 @@
 
         <div id="checklist-tasks"></div>
 
-        <button id="submit-btn" class="btn-submit" onclick="submitChecklist()">Υποβολή Ελέγχου</button>
+        <button id="submit-btn" class="btn-submit" onclick="submitChecklist()">Submit Inspection</button>
     </div>
 
     <script>
@@ -139,10 +139,10 @@
         html5QrcodeScanner.render(onScanSuccess);
 
         function loadChecklist(qrId) {
-            setStatus('Φόρτωση λίστας...');
+            setStatus('Loading checklist...');
             fetch('/get_checklist?qr_id=' + encodeURIComponent(qrId))
                 .then(res => {
-                    if (!res.ok) throw new Error('Η λίστα δεν βρέθηκε ή υπάρχει σφάλμα');
+                    if (!res.ok) throw new Error('Checklist not found or server error');
                     return res.json();
                 })
                 .then(data => {
@@ -154,7 +154,7 @@
                     currentQrId = data.qr_id;
                     currentChecklistData = data.checklist;
 
-                    document.getElementById('form-title').innerText = data.title || ('Λίστα: ' + data.qr_id);
+                    document.getElementById('form-title').innerText = data.title || ('Checklist: ' + data.qr_id);
                     const container = document.getElementById('checklist-tasks');
                     container.innerHTML = '';
 
@@ -172,14 +172,14 @@
                     setStatus('');
                 })
                 .catch(err => {
-                    setStatus('Σφάλμα: ' + err.message, true);
+                    setStatus('Error: ' + err.message, true);
                 });
         }
 
         function submitChecklist() {
             const sailorName = document.getElementById('sailor-name').value.trim();
             if (!sailorName) {
-                setStatus('Παρακαλώ εισάγετε το όνομα του ναύτη πριν την υποβολή.', true);
+                setStatus('Please enter the sailor name before submitting.', true);
                 return;
             }
 
@@ -188,7 +188,7 @@
             const checkboxes = document.querySelectorAll('#checklist-tasks .task-chk');
 
             if (checkboxes.length === 0) {
-                setStatus('Δεν βρέθηκαν σημεία ελέγχου.', true);
+                setStatus('No checklist items found.', true);
                 return;
             }
 
@@ -200,7 +200,7 @@
             });
 
             if (!allChecked) {
-                setStatus('Δεν σου επιτρέπεται να κάνεις υποβολή. Πρέπει να τσεκάρεις όλα τα items!', true);
+                setStatus('Submission not allowed. You must check all items!', true);
                 return;
             }
 
@@ -221,7 +221,7 @@
             };
 
             submitBtn.disabled = true;
-            setStatus('Αποστολή δεδομένων...');
+            setStatus('Sending data...');
 
             fetch('/submit_checklist', {
                 method: 'POST',
@@ -232,17 +232,17 @@
             .then(result => {
                 submitBtn.disabled = false;
                 if (result.success) {
-                    setStatus('Ο έλεγχος καταχωρήθηκε επιτυχώς.', false);
+                    setStatus('Inspection submitted successfully.', false);
                     document.getElementById('form-container').style.display = 'none';
                     document.getElementById('sailor-name').value = '';
                     html5QrcodeScanner.render(onScanSuccess);
                 } else {
-                    setStatus('Αποτυχία: ' + (result.error || 'Άγνωστο σφάλμα'), true);
+                    setStatus('Failure: ' + (result.error || 'Unknown error'), true);
                 }
             })
             .catch(err => {
                 submitBtn.disabled = false;
-                setStatus('Σφάλμα σύνδεσης: ' + err.message, true);
+                setStatus('Connection error: ' + err.message, true);
             });
         }
     </script>
