@@ -6,20 +6,20 @@
     <title>Equipment Inspection</title>
     <style>
         :root {
-            --primary: #004080;
-            --primary-dark: #002d5a;
-            --bg-color: #f4f6f9;
+            --primary: #102a43;
+            --primary-accent: #0056b3;
+            --bg-body: #f0f4f8;
             --card-bg: #ffffff;
-            --text-color: #333333;
-            --text-muted: #666666;
+            --text-main: #1f2937;
+            --text-muted: #627d98;
+            --border: #d9e2ec;
             --success: #28a745;
-            --border-color: #e1e4e8;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
             margin: 0;
             padding: 0;
             display: flex;
@@ -28,34 +28,44 @@
 
         .mobile-layout {
             width: 100%;
-            max-width: 500px;
-            background: var(--card-bg);
+            max-width: 480px;
+            background: #ffffff;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
         }
 
         .header {
-            background: var(--primary);
+            background: linear-gradient(135deg, #102a43, #243b53);
             color: #ffffff;
-            padding: 25px 20px;
+            padding: 24px 20px;
             text-align: center;
-            border-bottom-left-radius: 25px;
-            border-bottom-right-radius: 25px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             font-weight: 700;
         }
 
         .header p {
-            margin: 8px 0 0 0;
-            font-size: 0.9rem;
-            opacity: 0.85;
+            margin: 6px 0 0 0;
+            font-size: 0.85rem;
+            color: #9fb3c8;
+        }
+
+        .location-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            color: #f0f4f8;
+            font-weight: 600;
         }
 
         .content {
@@ -63,20 +73,28 @@
             flex: 1;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-            background: #fafafa;
-            padding: 15px;
+        .form-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
             border-radius: 12px;
-            border: 1px solid var(--border-color);
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
         }
 
         .form-group label {
             display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
+            font-size: 0.8rem;
+            font-weight: 700;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -84,50 +102,39 @@
         input[type="text"], select {
             width: 100%;
             padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
             box-sizing: border-box;
             background-color: #ffffff;
             outline: none;
-            transition: border-color 0.2s;
-        }
-
-        input[type="text"]:focus, select:focus {
-            border-color: var(--primary);
         }
 
         .section-header {
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             font-weight: 700;
-            margin: 30px 0 15px 0;
-            color: var(--primary);
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin: 20px 0 12px 0;
         }
 
         .check-card {
             background: #ffffff;
-            border: 1.5px solid var(--border-color);
+            border: 1.5px solid var(--border);
             border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             cursor: pointer;
         }
 
-        .check-card:hover {
-            border-color: #cbd5e1;
-            background-color: #fafafa;
-        }
-
         .check-card input[type="checkbox"] {
-            width: 24px;
-            height: 24px;
-            margin-right: 15px;
+            width: 22px;
+            height: 22px;
+            margin-right: 14px;
             accent-color: var(--success);
             cursor: pointer;
             flex-shrink: 0;
@@ -141,7 +148,7 @@
             display: block;
             font-size: 0.75rem;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--primary-accent);
             margin-bottom: 2px;
         }
 
@@ -149,23 +156,22 @@
             font-size: 0.95rem;
             font-weight: 500;
             margin: 0;
-            color: var(--text-color);
-            line-height: 1.3;
+            color: var(--text-main);
+            line-height: 1.35;
         }
 
         .submit-btn {
             width: 100%;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: linear-gradient(135deg, #102a43, #0056b3);
             color: white;
             border: none;
-            padding: 18px;
+            padding: 16px;
             border-radius: 12px;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             cursor: pointer;
-            margin-top: 30px;
-            box-shadow: 0 4px 15px rgba(0,64,128,0.3);
-            transition: transform 0.1s, opacity 0.2s;
+            margin-top: 25px;
+            box-shadow: 0 4px 12px rgba(16, 42, 67, 0.25);
         }
 
         .submit-btn:active {
@@ -179,69 +185,50 @@
     <div class="header">
         <h1>Equipment Inspection</h1>
         <p>Operational Safety Checklist</p>
+        <span class="location-badge">Location: {{ qr_id }}</span>
     </div>
 
-    <form class="content" action="/submit_checklist" method="POST">
-        <!-- Κρυφό πεδίο για το QR ID -->
-        <input type="hidden" id="qr_id_field" name="qr_id" value="">
+    <form class="content" action="/submit" method="POST">
+        <input type="hidden" name="qr_id" value="{{ qr_id }}">
 
-        <div class="form-group">
-            <label for="sailor_name">Inspector Name</label>
-            <input type="text" id="sailor_name" name="sailor_name" required placeholder="Enter your name">
-        </div>
+        <div class="form-card">
+            <div class="form-group">
+                <label for="sailor_name">Inspector Name / Rank</label>
+                <input type="text" id="sailor_name" name="sailor_name" required placeholder="e.g. 2/O Papadopoulos">
+            </div>
 
-        <div class="form-group">
-            <label for="shift">Shift</label>
-            <select id="shift" name="shift" required>
-                <option value="" disabled selected>Select your shift</option>
-                <option value="00:00 - 04:00">00:00 - 04:00</option>
-                <option value="04:00 - 08:00">04:00 - 08:00</option>
-                <option value="08:00 - 12:00">08:00 - 12:00</option>
-                <option value="12:00 - 16:00">12:00 - 16:00</option>
-                <option value="16:00 - 20:00">16:00 - 20:00</option>
-                <option value="20:00 - 24:00">20:00 - 24:00</option>
-            </select>
+            <div class="form-group">
+                <label for="shift">Watch / Shift</label>
+                <select id="shift" name="shift" required>
+                    <option value="" disabled selected>Select Watch</option>
+                    <option value="00:00 - 04:00">00:00 - 04:00</option>
+                    <option value="04:00 - 08:00">04:00 - 08:00</option>
+                    <option value="08:00 - 12:00">08:00 - 12:00</option>
+                    <option value="12:00 - 16:00">12:00 - 16:00</option>
+                    <option value="16:00 - 20:00">16:00 - 20:00</option>
+                    <option value="20:00 - 24:00">20:00 - 24:00</option>
+                    <option value="Day Work">Day Work</option>
+                </select>
+            </div>
         </div>
 
         <div class="section-header">Verification Items</div>
 
         <div id="checklist_container">
-            <!-- Τα σημεία ελέγχου φορτώνονται δυναμικά εδώ -->
+            {% for item in checklist %}
+            <label class="check-card">
+                <input type="checkbox" name="completed_{{ item.step }}" value="true">
+                <div class="check-info">
+                    <span class="check-step">CHECKPOINT {{ item.step }}</span>
+                    <p class="check-text">{{ item.checkpoint }}</p>
+                </div>
+            </label>
+            {% endfor %}
         </div>
 
         <button type="submit" class="submit-btn" id="submit_button">Submit Inspection</button>
     </form>
 </div>
-
-<script>
-    // Υποθέτουμε τη λειτουργία ανάκτησης δεδομένων που χρησιμοποιείς
-    window.onload = function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const qrId = urlParams.get('qr_id');
-        if (qrId) {
-            document.getElementById('qr_id_field').value = qrId;
-            fetch(`/get_checklist?qr_id=${qrId}`)
-                .then(response => response.json())
-                .then(data => {
-                    const container = document.getElementById('checklist_container');
-                    container.innerHTML = '';
-                    data.checklist.forEach(item => {
-                        const card = document.createElement('label');
-                        card.className = 'check-card';
-                        card.innerHTML = `
-                            <input type="checkbox" name="items" value='${JSON.stringify({step: item.step, checkpoint: item.checkpoint})}'>
-                            <div class="check-info">
-                                <span class="check-step">STEP ${item.step}</span>
-                                <p class="check-text">${item.checkpoint}</p>
-                            </div>
-                        `;
-                        container.appendChild(card);
-                    });
-                })
-                .catch(err => console.error('Error loading checklist:', err));
-        }
-    };
-</script>
 
 </body>
 </html>
