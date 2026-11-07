@@ -3,21 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scanner & Υποβολή Λίστας Ελέγχου</title>
+    <title>Σύστημα Ελέγχου Εξοπλισμού</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        body { font-family: Arial, sans-serif; padding: 15px; max-width: 600px; margin: auto; text-align: center; }
-        #reader { width: 100%; max-width: 320px; margin: 0 auto 15px; }
-        #form-container { display: none; text-align: left; margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background-color: #fdfdfd; }
-        .form-group { margin-bottom: 15px; }
-        label { font-weight: bold; display: block; margin-bottom: 5px; }
-        select { width: 100%; padding: 8px; font-size: 16px; border-radius: 4px; border: 1px solid #aaa; }
-        .task-item { display: flex; align-items: center; margin: 10px 0; padding: 8px; background: #f1f1f1; border-radius: 4px; }
-        .task-item input[type="checkbox"] { transform: scale(1.3); margin-right: 12px; cursor: pointer; }
-        .task-item label { margin: 0; font-weight: normal; font-size: 15px; cursor: pointer; }
-        button.btn-submit { width: 100%; padding: 12px; font-size: 16px; font-weight: bold; color: #fff; background-color: #007bff; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        button.btn-submit:disabled { background-color: #6c757d; cursor: not-allowed; }
-        #status-msg { margin-top: 15px; font-weight: bold; }
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 15px; 
+            max-width: 600px; 
+            margin: auto; 
+            text-align: center; 
+        }
+        #reader { 
+            width: 100%; 
+            max-width: 320px; 
+            margin: 0 auto 15px; 
+        }
+        #form-container { 
+            display: none; 
+            text-align: left; 
+            margin-top: 20px; 
+            padding: 15px; 
+            border: 1px solid #ccc; 
+            border-radius: 8px; 
+            background-color: #fdfdfd; 
+        }
+        .form-group { 
+            margin-bottom: 15px; 
+        }
+        label { 
+            font-weight: bold; 
+            display: block; 
+            margin-bottom: 5px; 
+        }
+        select { 
+            width: 100%; 
+            padding: 10px; 
+            font-size: 16px; 
+            border-radius: 6px; 
+            border: 1px solid #aaa; 
+            background: #fff;
+        }
+        .task-item { 
+            display: flex; 
+            align-items: center; 
+            margin: 10px 0; 
+            padding: 10px; 
+            background: #f1f1f1; 
+            border-radius: 6px; 
+        }
+        .task-item input[type="checkbox"] { 
+            transform: scale(1.4); 
+            margin-right: 14px; 
+            cursor: pointer; 
+        }
+        .task-item label { 
+            margin: 0; 
+            font-weight: normal; 
+            font-size: 15px; 
+            cursor: pointer; 
+        }
+        button.btn-submit { 
+            width: 100%; 
+            padding: 14px; 
+            font-size: 17px; 
+            font-weight: bold; 
+            color: #fff; 
+            background-color: #007bff; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            margin-top: 15px; 
+        }
+        button.btn-submit:disabled { 
+            background-color: #6c757d; 
+            cursor: not-allowed; 
+        }
+        #status-msg { 
+            margin-top: 15px; 
+            font-weight: bold; 
+            font-size: 16px; 
+        }
         .status-success { color: #28a745; }
         .status-error { color: #dc3545; }
     </style>
@@ -33,11 +98,11 @@
         <h3 id="form-title"></h3>
 
         <div class="form-group">
-            <label for="shift-select">Βάρδια (Shift):</label>
+            <label for="shift-select">Βάρδια (Watch / Shift):</label>
             <select id="shift-select">
-                <option value="Morning">Πρωινή (08:00 - 16:00)</option>
-                <option value="Evening">Απογευματινή (16:00 - 00:00)</option>
-                <option value="Night">Νυχτερινή (00:00 - 08:00)</option>
+                <option value="16:00 - 20:00">16:00 - 20:00</option>
+                <option value="20:00 - 00:00">20:00 - 00:00</option>
+                <option value="00:00 - 04:00">00:00 - 04:00</option>
             </select>
         </div>
 
@@ -68,7 +133,7 @@
             setStatus('Φόρτωση λίστας...');
             fetch('/get_checklist?qr_id=' + encodeURIComponent(qrId))
                 .then(res => {
-                    if (!res.ok) throw new Error('Checklist not found or server error');
+                    if (!res.ok) throw new Error('Η λίστα δεν βρέθηκε ή υπάρχει σφάλμα');
                     return res.json();
                 })
                 .then(data => {
@@ -88,7 +153,7 @@
                         const div = document.createElement('div');
                         div.className = 'task-item';
                         div.innerHTML = `
-                            <input type="checkbox" id="chk_${item.step}" data-step="${item.step}">
+                            <input type="checkbox" id="chk_${item.step}" class="task-chk" data-step="${item.step}">
                             <label for="chk_${item.step}">${item.step}. ${item.checkpoint}</label>
                         `;
                         container.appendChild(div);
@@ -105,6 +170,24 @@
         function submitChecklist() {
             const submitBtn = document.getElementById('submit-btn');
             const shift = document.getElementById('shift-select').value;
+            const checkboxes = document.querySelectorAll('#checklist-tasks .task-chk');
+
+            if (checkboxes.length === 0) {
+                setStatus('Δεν βρέθηκαν σημεία ελέγχου.', true);
+                return;
+            }
+
+            let allChecked = true;
+            checkboxes.forEach(chk => {
+                if (!chk.checked) {
+                    allChecked = false;
+                }
+            });
+
+            if (!allChecked) {
+                setStatus('Δεν σου επιτρέπεται να κάνεις υποβολή. Πρέπει να τσεκάρεις όλα τα items!', true);
+                return;
+            }
 
             const itemsPayload = currentChecklistData.map(item => {
                 const chk = document.getElementById('chk_' + item.step);
