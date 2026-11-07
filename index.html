@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duty Inspection</title>
+    <title>Safety Security Inspection</title>
     <style>
         :root {
             --primary-color: #0056b3;
@@ -12,7 +12,7 @@
             --text-color: #333333;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
@@ -39,7 +39,7 @@
             margin-bottom: 5px;
             font-weight: 600;
         }
-        input[type="text"], select {
+        input[type="text"], select, input[type="file"] {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
@@ -61,7 +61,7 @@
         .checkbox-item:last-child {
             margin-bottom: 0;
         }
-        .checkbox-item input {
+        .checkbox-item input[type="checkbox"] {
             transform: scale(1.3);
             margin-right: 15px;
         }
@@ -89,8 +89,8 @@
 <body>
 
 <div class="container">
-    <h2>Duty Inspection</h2>
-    <form action="/submit" method="POST">
+    <h2>Safety Security Inspection</h2>
+    <form action="/submit" method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <label for="sailor_name">Sailor Name:</label>
             <input type="text" id="sailor_name" name="sailor_name" required>
@@ -99,20 +99,19 @@
         <div class="form-group">
             <label for="shift">Choose Watch:</label>
             <select id="shift" name="shift" required>
-                <option value="">--Select Watch--</option>
-                <option value="Morning Watch (04:00 - 08:00)">Morning Watch (04:00 - 08:00)</option>
-                <option value="Forenoon Watch (08:00 - 12:00)">Forenoon Watch (08:00 - 12:00)</option>
-                <option value="Afternoon Watch (12:00 - 16:00)">Afternoon Watch (12:00 - 16:00)</option>
-                <option value="First Dog Watch (16:00 - 18:00)">First Dog Watch (16:00 - 18:00)</option>
-                <option value="Second Dog Watch (18:00 - 20:00)">Second Dog Watch (18:00 - 20:00)</option>
-                <option value="Middle Watch (20:00 - 24:00)">Middle Watch (20:00 - 24:00)</option>
-                <option value="Anchor Watch">Anchor Watch</option>
+                <option value="">--Select 4-Hour Watch--</option>
+                <option value="00:00 - 04:00">00:00 - 04:00</option>
+                <option value="04:00 - 08:00">04:00 - 08:00</option>
+                <option value="08:00 - 12:00">08:00 - 12:00</option>
+                <option value="12:00 - 16:00">12:00 - 16:00</option>
+                <option value="16:00 - 20:00">16:00 - 20:00</option>
+                <option value="20:00 - 24:00">20:00 - 24:00</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="qr_id">Location (QR ID):</label>
-            <input type="text" id="qr_id" name="qr_id" required>
+            <label for="qr_image">Scan Location QR (Camera) or Upload Photo:</label>
+            <input type="file" id="qr_image" name="qr_image" accept="image/*" capture="environment" required>
         </div>
 
         <div class="checkbox-group">
