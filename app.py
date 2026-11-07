@@ -1,56 +1,44 @@
-from flask import Flask, request, jsonify
 import csv
-import os
+from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-DATA_FILE = 'safety_checks.csv'
-CHECKLISTS_FILE = 'checklists_template.csv'
-
-def init_csv():
-    if not os.path.exists(DATA_FILE):
-        with open(DATA_FILE, mode='w', newline='', encoding='utf-8') as file:
-            writer = csv.writer(file)
-            writer.writerow(['Timestamp', 'Sailor_Name', 'Round_ID', 'Status'])
 
 def load_checklists():
-    checklists = {}
-    if os.path.exists(CHECKLISTS_FILE):
-        with open(CHECKLISTS_FILE, mode='r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                qr_id = row['QR_ID']
-                if qr_id not in checklists:
-                    checklists[qr_id] = []
-                checklists[qr_id].append({
-                    'step_number': row['Step_Number'],
-                    'checkpoint': row['Checkpoint']
-                })
-    return checklists
+  checklists = {}
+  try:
+    with open("checklists_template.csv", mode="r", encoding="utf-8") as f:
+      reader = csv.DictReader(f)
+      for row in reader:
+        qr = row.get("QR_ID", "").strip()
+        step = row.get("Step_Number", "").strip()
+        checkpoint = row.get("Checkpoint", "").strip()
+        if qr:
+          if qr not in checklists:
+            checklists[qr] = []
+          checklists[qr].append({"step": step, "checkpoint": checkpoint})
+  except Exception as e:
+    print(f"Error reading CSV: {e}")
+  return checklists
 
-@app.route('/get_checklist', methods=['GET'])
+
+@app.route("/")
+def home():
+  return "Checklist API is running!"
+
+
+@app.route("/get_checklist", methods=["GET"])
 def get_checklist():
-    qr_id = request.args.get('qr_id')
-    checklists = load_checklists()
-    if qr_id in checklists:
-        return jsonify({'qr_id': qr_id, 'checklist': checklists[qr_id]}), 200
-    return jsonify({'error': 'Checklist not found'}), 404
+  qr_id = request.args.get("qr_id", "").strip()
+  if not qr_id:
+    return jsonify({"error": "Missing qr_id parameter"}), 400
 
-@app.route('/submit', methods=['POST'])
-def submit_check():
-    data = request.form
-    timestamp = data.get('timestamp')
-    sailor_name = data.get('sailor_name')
-    round_id = data.get('round_id')
-    status = data.get('status')
-    
-    with open(DATA_FILE, mode='a', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerow([timestamp, sailor_name, round_id, status])
-        
-    return jsonify({'message': 'Success'}), 200
+  data = load_checklists()
+  if qr_id in data:
+    return jsonify({"qr_id": qr_id, "checklist": data[qr_id]})
+  else:
+    return jsonify({"error": "Checklist not found"}), 404
 
-if __name__ == '__main__':
-    init_csv()
-    app.run(host='0.0.0.0', port=5000)
-``` Αυτός ο κώδικας διαβάζει το αρχείο με τις λίστες και επιστρέφει τα βήματα ανάλογα με τον κωδικό QR που θα σκαναριστεί.
+
+if __name__ == "__main__":
+  app.run()
