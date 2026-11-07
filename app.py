@@ -8,19 +8,19 @@ app = Flask(__name__)
 CHECKLISTS = {
     "QR123": {
         "qr_id": "QR123",
-        "title": "Έλεγχος Ασφαλείας Εξοπλισμού",
+        "title": "Equipment Safety Check",
         "checklist": [
             {
                 "step": 1,
-                "checkpoint": "Έλεγχος στάθμης λαδιών και διαρροών",
+                "checkpoint": "Check fluid levels and inspect for leaks",
             },
             {
                 "step": 2,
-                "checkpoint": "Έλεγχος φρένων και πίεσης μηχανισμού",
+                "checkpoint": "Test brake functionality and linkage tension",
             },
             {
                 "step": 3,
-                "checkpoint": "Επιβεβαίωση λειτουργίας στοπ ανάγκης",
+                "checkpoint": "Verify emergency stop operation",
             },
         ],
     }
@@ -87,15 +87,19 @@ def submit_checklist():
     )
 
   qr_id = payload.get("qr_id")
+  sailor_name = payload.get("sailor_name")
   shift = payload.get("shift")
   items = payload.get("items")
 
-  if not qr_id or not shift or not isinstance(items, list):
+  if not qr_id or not sailor_name or not shift or not isinstance(items, list):
     return (
         jsonify(
             {
                 "success": False,
-                "error": "Missing required fields: qr_id, shift, or items",
+                "error": (
+                    "Missing required fields: qr_id, sailor_name, shift, or"
+                    " items"
+                ),
             }
         ),
         422,
@@ -105,6 +109,7 @@ def submit_checklist():
   submission_entry = {
       "submission_id": f"{qr_id}_{int(now.timestamp())}",
       "qr_id": qr_id,
+      "sailor_name": sailor_name,
       "date": now.strftime("%Y-%m-%d"),
       "time_utc": now.strftime("%H:%M:%S"),
       "shift": shift,
@@ -154,7 +159,6 @@ def view_submissions():
     except (json.JSONDecodeError, Exception):
       data = []
 
-  # Ταξινόμηση ώστε οι πιο πρόσφατες υποβολές να φαίνονται πρώτες
   data.sort(
       key=lambda x: x.get("time_utc", ""),
       reverse=True,
