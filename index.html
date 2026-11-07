@@ -1,232 +1,150 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="el">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Equipment Inspection</title>
+    <title>Duty Inspection</title>
     <style>
         :root {
-            --primary: #102a43;
-            --primary-accent: #0056b3;
-            --bg-body: #f0f4f8;
+            --primary-color: #0056b3;
+            --bg-color: #f4f7f6;
             --card-bg: #ffffff;
-            --text-main: #1f2937;
-            --text-muted: #627d98;
-            --border: #d9e2ec;
-            --success: #28a745;
+            --text-color: #333333;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-main);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
+            padding: 20px;
         }
-
-        .mobile-layout {
-            width: 100%;
-            max-width: 480px;
-            background: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-
-        .header {
-            background: linear-gradient(135deg, #102a43, #243b53);
-            color: #ffffff;
-            padding: 24px 20px;
+        h2 {
             text-align: center;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
         }
-
-        .header h1 {
-            margin: 0;
-            font-size: 1.35rem;
-            font-weight: 700;
+        .form-group {
+            margin-bottom: 15px;
         }
-
-        .header p {
-            margin: 6px 0 0 0;
-            font-size: 0.85rem;
-            color: #9fb3c8;
-        }
-
-        .location-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            margin-top: 10px;
-            color: #f0f4f8;
+        label {
+            display: block;
+            margin-bottom: 5px;
             font-weight: 600;
         }
-
-        .content {
-            padding: 20px;
-            flex: 1;
-        }
-
-        .form-card {
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 24px;
-        }
-
-        .form-group {
-            margin-bottom: 14px;
-        }
-
-        .form-group:last-child {
-            margin-bottom: 0;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
         input[type="text"], select {
             width: 100%;
-            padding: 12px;
-            border: 1.5px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.95rem;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
             box-sizing: border-box;
-            background-color: #ffffff;
-            outline: none;
+            font-size: 16px;
         }
-
-        .section-header {
-            font-size: 0.9rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-            margin: 20px 0 12px 0;
+        .checkbox-group {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
-
-        .check-card {
-            background: #ffffff;
-            border: 1.5px solid var(--border);
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 10px;
+        .checkbox-item {
             display: flex;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            margin-bottom: 10px;
+        }
+        .checkbox-item:last-child {
+            margin-bottom: 0;
+        }
+        .checkbox-item input {
+            transform: scale(1.3);
+            margin-right: 15px;
+        }
+        .checkbox-item label {
+            margin-bottom: 0;
             cursor: pointer;
+            font-weight: normal;
         }
-
-        .check-card input[type="checkbox"] {
-            width: 22px;
-            height: 22px;
-            margin-right: 14px;
-            accent-color: var(--success);
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-
-        .check-info {
-            flex: 1;
-        }
-
-        .check-step {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--primary-accent);
-            margin-bottom: 2px;
-        }
-
-        .check-text {
-            font-size: 0.95rem;
-            font-weight: 500;
-            margin: 0;
-            color: var(--text-main);
-            line-height: 1.35;
-        }
-
-        .submit-btn {
+        button {
             width: 100%;
-            background: linear-gradient(135deg, #102a43, #0056b3);
+            padding: 12px;
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 1.05rem;
-            font-weight: 700;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
-            margin-top: 25px;
-            box-shadow: 0 4px 12px rgba(16, 42, 67, 0.25);
         }
-
-        .submit-btn:active {
-            transform: scale(0.98);
+        button:hover {
+            background-color: #004494;
         }
     </style>
 </head>
 <body>
 
-<div class="mobile-layout">
-    <div class="header">
-        <h1>Equipment Inspection</h1>
-        <p>Operational Safety Checklist</p>
-        <span class="location-badge">Location: {{ qr_id }}</span>
-    </div>
+<div class="container">
+    <h2>Duty Inspection</h2>
+    <form action="/submit" method="POST">
+        <div class="form-group">
+            <label for="sailor_name">Sailor Name:</label>
+            <input type="text" id="sailor_name" name="sailor_name" required>
+        </div>
 
-    <form class="content" action="/submit" method="POST">
-        <input type="hidden" name="qr_id" value="{{ qr_id }}">
+        <div class="form-group">
+            <label for="shift">Choose Watch:</label>
+            <select id="shift" name="shift" required>
+                <option value="">--Select Watch--</option>
+                <option value="Morning Watch (04:00 - 08:00)">Morning Watch (04:00 - 08:00)</option>
+                <option value="Forenoon Watch (08:00 - 12:00)">Forenoon Watch (08:00 - 12:00)</option>
+                <option value="Afternoon Watch (12:00 - 16:00)">Afternoon Watch (12:00 - 16:00)</option>
+                <option value="First Dog Watch (16:00 - 18:00)">First Dog Watch (16:00 - 18:00)</option>
+                <option value="Second Dog Watch (18:00 - 20:00)">Second Dog Watch (18:00 - 20:00)</option>
+                <option value="Middle Watch (20:00 - 24:00)">Middle Watch (20:00 - 24:00)</option>
+                <option value="Anchor Watch">Anchor Watch</option>
+            </select>
+        </div>
 
-        <div class="form-card">
-            <div class="form-group">
-                <label for="sailor_name">Inspector Name / Rank</label>
-                <input type="text" id="sailor_name" name="sailor_name" required placeholder="e.g. 2/O Papadopoulos">
+        <div class="form-group">
+            <label for="qr_id">Location (QR ID):</label>
+            <input type="text" id="qr_id" name="qr_id" required>
+        </div>
+
+        <div class="checkbox-group">
+            <label>Verify Checkpoints:</label>
+            
+            <div class="checkbox-item">
+                <input type="checkbox" id="item1" name="items" value="Lifebuoys and flares check" required>
+                <label for="item1">Lifebuoys and flares check</label>
             </div>
-
-            <div class="form-group">
-                <label for="shift">Watch / Shift</label>
-                <select id="shift" name="shift" required>
-                    <option value="" disabled selected>Select Watch</option>
-                    <option value="00:00 - 04:00">00:00 - 04:00</option>
-                    <option value="04:00 - 08:00">04:00 - 08:00</option>
-                    <option value="08:00 - 12:00">08:00 - 12:00</option>
-                    <option value="12:00 - 16:00">12:00 - 16:00</option>
-                    <option value="16:00 - 20:00">16:00 - 20:00</option>
-                    <option value="20:00 - 24:00">20:00 - 24:00</option>
-                    <option value="Day Work">Day Work</option>
-                </select>
+            
+            <div class="checkbox-item">
+                <input type="checkbox" id="item2" name="items" value="Fire hoses and hydrants check" required>
+                <label for="item2">Fire hoses and hydrants check</label>
+            </div>
+            
+            <div class="checkbox-item">
+                <input type="checkbox" id="item3" name="items" value="Water-tight doors secured" required>
+                <label for="item3">Water-tight doors secured</label>
+            </div>
+            
+            <div class="checkbox-item">
+                <input type="checkbox" id="item4" name="items" value="Navigation lights functioning" required>
+                <label for="item4">Navigation lights functioning</label>
+            </div>
+            
+            <div class="checkbox-item">
+                <input type="checkbox" id="item5" name="items" value="Emergency exits clear" required>
+                <label for="item5">Emergency exits clear</label>
             </div>
         </div>
 
-        <div class="section-header">Verification Items</div>
-
-        <div id="checklist_container">
-            {% for item in checklist %}
-            <label class="check-card">
-                <input type="checkbox" name="completed_{{ item.step }}" value="true">
-                <div class="check-info">
-                    <span class="check-step">CHECKPOINT {{ item.step }}</span>
-                    <p class="check-text">{{ item.checkpoint }}</p>
-                </div>
-            </label>
-            {% endfor %}
-        </div>
-
-        <button type="submit" class="submit-btn" id="submit_button">Submit Inspection</button>
+        <button type="submit">Submit Inspection</button>
     </form>
 </div>
 
