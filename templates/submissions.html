@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="el">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Πίνακας Ελέγχων Αξιωματικού</title>
+    <title>Officer Inspection Dashboard</title>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f6f9; }
         h1 { text-align: center; color: #333; }
@@ -19,15 +19,16 @@
 </head>
 <body>
 
-    <h1>Υποβολές Ελέγχων Εξοπλισμού</h1>
+    <h1>Equipment Inspection Submissions</h1>
 
     {% if submissions %}
         {% for sub in submissions %}
             <div class="submission-card">
                 <div class="card-header">
-                    <span>Κωδικός: {{ sub.qr_id }}</span>
-                    <span>Βάρδια: {{ sub.shift }}</span>
-                    <span>Ημερομηνία: {{ sub.date }} {{ sub.time_utc }} UTC</span>
+                    <span>Code: {{ sub.qr_id }}</span>
+                    <span>Sailor: {{ sub.sailor_name }}</span>
+                    <span>Shift: {{ sub.shift }}</span>
+                    <span>Date: {{ sub.date }} {{ sub.time_utc }} UTC</span>
                 </div>
                 <ul class="task-list">
                     {% for item in sub.items %}
@@ -42,7 +43,7 @@
             </div>
         {% endfor %}
     {% else %}
-        <div class="empty-msg">Δεν υπάρχουν καταχωρημένες υποβολές τις τελευταίες 30 ημέρες.</div>
+        <div class="empty-msg">No submissions recorded in the last 30 days.</div>
     {% endif %}
 
 </body>
