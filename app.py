@@ -1,30 +1,39 @@
-import csv
-from flask import Flask, jsonify, request
+import datetime
+import json
+import os
+from flask import Flask, jsonify, render_template, request
 
 app = Flask(__name__)
 
+CHECKLISTS = {
+    "QR123": {
+        "qr_id": "QR123",
+        "title": "Έλεγχος Ασφαλείας Εξοπλισμού",
+        "checklist": [
+            {
+                "step": 1,
+                "checkpoint": "Έλεγχος στάθμης λαδιών και διαρροών",
+            },
+            {
+                "step": 2,
+                "checkpoint": "Έλεγχος φρένων και πίεσης μηχανισμού",
+            },
+            {
+                "step": 3,
+                "checkpoint": "Επιβεβαίωση λειτουργίας στοπ ανάγκης",
+            },
+        ],
+    }
+}
 
-def load_checklists():
-  checklists = {}
-  try:
-    with open("checklists_template.csv", mode="r", encoding="utf-8") as f:
-      reader = csv.DictReader(f)
-      for row in reader:
-        qr = row.get("QR_ID", "").strip()
-        step = row.get("Step_Number", "").strip()
-        checkpoint = row.get("Checkpoint", "").strip()
-        if qr:
-          if qr not in checklists:
-            checklists[qr] = []
-          checklists[qr].append({"step": step, "checkpoint": checkpoint})
-  except Exception as e:
-    print(f"Error reading CSV: {e}")
-  return checklists
+SUBMISSIONS_FILE = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "submissions.json"
+)
 
 
 @app.route("/")
 def home():
-  return "Checklist API is running!"
+  return render_template("index.html")
 
 
 @app.route("/get_checklist", methods=["GET"])
@@ -33,12 +42,75 @@ def get_checklist():
   if not qr_id:
     return jsonify({"error": "Missing qr_id parameter"}), 400
 
-  data = load_checklists()
-  if qr_id in data:
-    return jsonify({"qr_id": qr_id, "checklist": data[qr_id]})
-  else:
-    return jsonify({"error": "Checklist not found"}), 404
+  data = CHECKLISTS.get(qr_id)
+  if not data:
+    return jsonify({"error": f"Checklist not found for ID: {qr_id}"}), 404
+
+  return jsonify(data), 200
+
+
+@app.route("/submit_checklist", methods=["POST"])
+def submit_checklist():
+  payload = request.get_json(silent=True)
+  if not payload:
+    return (
+        jsonify({"success": False, "error": "Invalid or missing JSON payload"}),
+        400,
+    )
+
+  qr_id = payload.get("qr_id")
+  shift = payload.get("shift")
+  items = payload.get("items")
+
+  if not qr_id or not shift or not isinstance(items, list):
+    return (
+        jsonify(
+            {
+                "success": False,
+                "error": "Missing required fields: qr_id, shift, or items",
+            }
+        ),
+        422,
+    )
+
+  now = datetime.datetime.utcnow()
+  submission_entry = {
+      "submission_id": f"{qr_id}_{int(now.timestamp())}",
+      "qr_id": qr_id,
+      "date": now.strftime("%Y-%m-%d"),
+      "time_utc": now.strftime("%H:%M:%S"),
+      "shift": shift,
+      "items": items,
+  }
+
+  try:
+    data = []
+    if os.path.exists(SUBMISSIONS_FILE):
+      with open(SUBMISSIONS_FILE, "r", encoding="utf-8") as f:
+        try:
+          data = json.load(f)
+          if not isinstance(data, list):
+            data = []
+        except json.JSONDecodeError:
+          data = []
+
+    data.append(submission_entry)
+
+    with open(SUBMISSIONS_FILE, "w", encoding="utf-8") as f:
+      json.dump(data, f, indent=4, ensure_ascii=False)
+
+    return (
+        jsonify({
+            "success": True,
+            "message": "Checklist submitted successfully",
+            "submission": submission_entry,
+        }),
+        201,
+    )
+
+  except Exception as e:
+    return jsonify({"success": False, "error": f"File storage failure: {e}"}), 500
 
 
 if __name__ == "__main__":
-  app.run()
+  app.run(debug=True)
