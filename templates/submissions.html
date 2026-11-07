@@ -13,34 +13,40 @@
             color: #102a43;
         }
         .container {
-            max-width: 900px;
+            max-width: 600px;
             margin: 0 auto;
         }
         h1 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             color: #102a43;
             margin-bottom: 20px;
+            text-align: center;
         }
         .card {
             background: #ffffff;
             border-radius: 12px;
-            padding: 16px 20px;
+            padding: 16px;
             margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             border-left: 5px solid #0056b3;
         }
         .card-header {
             display: flex;
             justify-content: space-between;
-            font-weight: bold;
+            align-items: center;
             border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 8px;
+            padding-bottom: 10px;
             margin-bottom: 10px;
         }
+        .card-header strong {
+            font-size: 1.05rem;
+            color: #102a43;
+        }
         .meta-info {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #627d98;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            line-height: 1.4;
         }
         .task-list {
             list-style: none;
@@ -50,19 +56,34 @@
         .task-item {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             padding: 6px 0;
-            font-size: 0.9rem;
-            border-bottom: 1px dashed #f0f4f8;
+            font-size: 0.85rem;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .task-item:last-child {
+            border-bottom: none;
         }
         .badge {
             font-size: 0.75rem;
-            padding: 2px 8px;
-            border-radius: 4px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .badge-loc {
             background: #e2e8f0;
+            color: #334e68;
         }
         .badge-success {
             background: #d4edda;
             color: #155724;
+        }
+        .no-records {
+            text-align: center;
+            color: #627d98;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
         }
     </style>
 </head>
@@ -71,25 +92,32 @@
     <h1>Inspection Logs</h1>
 
     {% if not submissions %}
-        <p>Δεν υπάρχουν ακόμη καταγεγραμμένες επιθεωρήσεις.</p>
+        <div class="no-records">Δεν υπάρχουν ακόμη καταγεγραμμένες επιθεωρήσεις.</div>
     {% endif %}
 
     {% for sub in submissions %}
     <div class="card">
         <div class="card-header">
-            <span>Inspector: {{ sub.sailor_name }}</span>
-            <span class="badge badge-success">{{ sub.qr_id }}</span>
+            <strong>{{ sub.sailor_name }}</strong>
+            <span class="badge badge-loc">{{ sub.qr_id }}</span>
         </div>
         <div class="meta-info">
-            <strong>Watch:</strong> {{ sub.shift }} | <strong>Date/Time:</strong> {{ sub.timestamp }}
+            <strong>Watch:</strong> {{ sub.shift }}<br>
+            <strong>Date/Time:</strong> {{ sub.timestamp }}
         </div>
+        
         <ul class="task-list">
-            {% for item in sub['items'] %}
-            <li class="task-item">
-                <span>{{ item.checkpoint if item.checkpoint else item }}</span>
-                <span class="badge badge-success">Verified</span>
-            </li>
-            {% endfor %}
+            {% set items_list = sub.get('items', []) %}
+            {% if items_list is iterable and items_list is not string and items_list is not mapping %}
+                {% for item in items_list %}
+                <li class="task-item">
+                    <span>{{ item.checkpoint if item is mapping and item.checkpoint else item }}</span>
+                    <span class="badge badge-success">Verified</span>
+                </li>
+                {% endfor %}
+            {% else %}
+                <li class="task-item"><span>Checkpoints verified</span><span class="badge badge-success">OK</span></li>
+            {% endif %}
         </ul>
     </div>
     {% endfor %}
